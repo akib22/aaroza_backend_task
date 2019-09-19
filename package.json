@@ -1,0 +1,19 @@
+{
+  "name": "aaroza_backend_task",
+  "version": "1.0.0",
+  "main": "app.js",
+  "author": "Akibur Rahman",
+  "license": "MIT",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "dependencies": {
+    "dotenv": "^8.1.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.7.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.2"
+  }
+}
