@@ -2,12 +2,21 @@ const express = require('express');
 const mongoose = require('mongoose');
 require('dotenv').config();
 
+// local dependencies
 const pageNotFound = require('./middlewares/404');
+const publicRoute = require('./routes/publicRoutes');
+const authRoute = require('./routes/authRoutes');
 
 const app = express();
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+
+// public routes
+app.use('/api', publicRoute);
+
+// auth routes
+app.use('/api/user', authRoute);
 
 // page not found or 404 middleware
 app.use(pageNotFound);
