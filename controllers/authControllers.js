@@ -17,11 +17,11 @@ exports.postSignUp = async (req, res, next) => {
   const validationResult = signupInputValidation(req.body);
 
   if (validationResult.err) {
-    return res.status(400).json({
-      success: false,
-      msg: 'validation failed.',
-      errors: validationResult.err
-    });
+    const err = new Error();
+    err.statusCode = 400;
+    err.msg = 'validation failed.';
+    err.errors = validationResult.err;
+    return next(err);
   }
 
   validationResult.password = await hashPassword(validationResult.password);
@@ -34,8 +34,8 @@ exports.postSignUp = async (req, res, next) => {
 
   newUser
     .save()
-    .then(() => {
-      const token = jwt.sign({ username }, process.env.SECRET);
+    .then(user => {
+      const token = jwt.sign({ id: user.id }, process.env.SECRET);
       res.status(201).json({ success: true, token });
     })
     .catch(err => next(err));
@@ -50,11 +50,11 @@ exports.postLogIn = (req, res, next) => {
   const validationResult = loginInputValidation(req.body);
 
   if (validationResult.err) {
-    return res.status(400).json({
-      success: false,
-      msg: 'validation failed.',
-      errors: validationResult.err
-    });
+    const err = new Error();
+    err.statusCode = 400;
+    err.msg = 'validation failed.';
+    err.errors = validationResult.err;
+    return next(err);
   }
 
   const { username, password } = validationResult;
@@ -62,21 +62,24 @@ exports.postLogIn = (req, res, next) => {
   User.findOne({ username })
     .then(async user => {
       if (!user) {
-        return res.status(400).json({
-          success: false,
-          msg: 'cannot find any user with this username.'
-        });
+        const err = new Error();
+        err.statusCode = 400;
+        err.msg = 'cannot find any user with this username.';
+        err.errors = validationResult.err;
+        return next(err);
       }
 
       const isEqual = await bcrypt.compare(password, user.password);
 
       if (!isEqual) {
-        return res
-          .status(400)
-          .json({ success: false, msg: 'incorrect password.' });
+        const err = new Error();
+        err.statusCode = 400;
+        err.msg = 'incorrect password.';
+        err.errors = validationResult.err;
+        return next(err);
       }
 
-      const token = jwt.sign({ username }, process.env.SECRET);
+      const token = jwt.sign({ id: user.id }, process.env.SECRET);
 
       res
         .status(200)

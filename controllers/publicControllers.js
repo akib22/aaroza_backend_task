@@ -1,12 +1,17 @@
+const Actor = require('../models/Actor');
+const Movie = require('../models/Movie');
+
 /**
  * @controller get actors
  * @desc find all actors from database then return them.
  * @return [{actors}]
  */
-exports.getActors = (req, res) => {
-  res
-    .status(200)
-    .json({ name: 'Tom Hanks', birthday: '09-07-1956', country: 'UK' });
+exports.getActors = (req, res, next) => {
+  Actor.find()
+    .then(actors => {
+      res.status(200).json(actors);
+    })
+    .catch(err => next(err));
 };
 
 /**
@@ -14,15 +19,11 @@ exports.getActors = (req, res) => {
  * @desc find all movies from database then return them.
  * @return [{movies}]
  */
-exports.getMovies = (req, res) => {
-  res.status(200).json([
-    {
-      title: 'Forrest Gump',
-      year: 1994,
-      rating: 4.7,
-      actors: [
-        { name: 'Tom Hanks', birthday: '09-07-1956', country: 'America' }
-      ]
-    }
-  ]);
+exports.getMovies = (req, res, next) => {
+  Movie.find()
+    .populate('actors')
+    .exec((err, movies) => {
+      if (err) return next(err);
+      res.status(200).json({ movies });
+    });
 };

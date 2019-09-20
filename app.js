@@ -4,7 +4,7 @@ require('dotenv').config();
 
 // local dependencies
 const pageNotFound = require('./middlewares/404');
-const errorHandler = require('./middlewares/500');
+const errorHandler = require('./middlewares/error-handler');
 const publicRoute = require('./routes/publicRoutes');
 const authRoute = require('./routes/authRoutes');
 const adminRoute = require('./routes/adminRoutes');
