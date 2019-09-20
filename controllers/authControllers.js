@@ -1,13 +1,18 @@
-const User = require('../models/User');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
+const User = require('../models/User');
 const {
   signupInputValidation,
   loginInputValidation
 } = require('../util/validator');
-
 const { hashPassword } = require('../util/hashPassword');
 
-// signup controller
+/**
+ * @controller signup
+ * @desc check provided information, if information is valid save as a users to the database.
+ * @return
+ */
 exports.postSignUp = async (req, res, next) => {
   const validationResult = signupInputValidation(req.body);
 
@@ -29,11 +34,53 @@ exports.postSignUp = async (req, res, next) => {
 
   newUser
     .save()
-    .then(user => res.status(201).json({ user, token: 'fafdkfld' }))
+    .then(() => {
+      const token = jwt.sign({ username }, process.env.SECRET);
+      res.status(201).json({ success: true, token });
+    })
     .catch(err => next(err));
 };
 
-exports.postLogIn = (req, res) => {
+/**
+ * @controller login
+ * @desc check provided information, If all information is valid then generated a jsonwebtoken.
+ * @return
+ */
+exports.postLogIn = (req, res, next) => {
   const validationResult = loginInputValidation(req.body);
-  res.status(201).json({ token: 'fafdkfldlogin' });
+
+  if (validationResult.err) {
+    return res.status(400).json({
+      success: false,
+      msg: 'validation failed.',
+      errors: validationResult.err
+    });
+  }
+
+  const { username, password } = validationResult;
+
+  User.findOne({ username })
+    .then(async user => {
+      if (!user) {
+        return res.status(400).json({
+          success: false,
+          msg: 'cannot find any user with this username.'
+        });
+      }
+
+      const isEqual = await bcrypt.compare(password, user.password);
+
+      if (!isEqual) {
+        return res
+          .status(400)
+          .json({ success: false, msg: 'incorrect password.' });
+      }
+
+      const token = jwt.sign({ username }, process.env.SECRET);
+
+      res
+        .status(200)
+        .json({ success: true, token, msg: 'you are successfully logged in' });
+    })
+    .catch(err => next(err));
 };
