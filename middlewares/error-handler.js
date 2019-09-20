@@ -1,9 +1,9 @@
 module.exports = (error, req, res, next) => {
-  const { statusCode, msg } = error;
+  let { statusCode } = error;
 
-  if (!statusCode) error.statusCode = 500;
+  if (!statusCode) statusCode = 500;
 
-  if (!msg) error.msg = 'server error.';
+  if (!error.msg) error.msg = 'server error.';
 
   console.log(error, 'error');
 

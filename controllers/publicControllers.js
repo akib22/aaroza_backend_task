@@ -24,6 +24,6 @@ exports.getMovies = (req, res, next) => {
     .populate('actors')
     .exec((err, movies) => {
       if (err) return next(err);
-      res.status(200).json({ movies });
+      res.status(200).json(movies);
     });
 };
