@@ -10,12 +10,12 @@ const signupInputValidation = data => {
   // username validation
   if (!username || validator.isEmpty(username)) {
     err.push('username is required.');
-  } else if (!validator.isLength(username, { min: 3, max: 10 })) {
-    err.push('username should be between 3 to 10 characters.');
+  } else if (!validator.isLength(username, { min: 3, max: 20 })) {
+    err.push('username should be between 3 to 20 characters.');
   }
 
   // password validation
-  if (validator.isEmpty(password)) {
+  if (!password || validator.isEmpty(password)) {
     err.push('password is required.');
   } else if (!validator.isLength(password, { min: 8 })) {
     err.push('password should be at least 8 characters.');
@@ -36,7 +36,7 @@ const loginInputValidation = data => {
     err.push('username is required.');
   }
   // password validation
-  if (validator.isEmpty(password)) {
+  if (!password || validator.isEmpty(password)) {
     err.push('password is required.');
   }
 
