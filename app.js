@@ -4,8 +4,10 @@ require('dotenv').config();
 
 // local dependencies
 const pageNotFound = require('./middlewares/404');
+const errorHandler = require('./middlewares/500');
 const publicRoute = require('./routes/publicRoutes');
 const authRoute = require('./routes/authRoutes');
+const adminRoute = require('./routes/adminRoutes');
 
 const app = express();
 
@@ -18,8 +20,14 @@ app.use('/api', publicRoute);
 // auth routes
 app.use('/api/user', authRoute);
 
+// admin routes
+app.use('/api/admin', adminRoute);
+
 // page not found or 404 middleware
 app.use(pageNotFound);
+
+// server error or 500 middleware
+app.use(errorHandler);
 
 mongoose
   .connect(process.env.MONGO_DB_URI, { useNewUrlParser: true })
