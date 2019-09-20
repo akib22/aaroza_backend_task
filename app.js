@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
 require('dotenv').config();
 
 // local dependencies
@@ -13,6 +14,9 @@ const app = express();
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+
+// cors middleware
+app.use(cors());
 
 // public routes
 app.use('/api', publicRoute);
