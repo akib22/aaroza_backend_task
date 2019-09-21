@@ -1,5 +1,9 @@
 const Actor = require('../models/Actor');
 const Movie = require('../models/Movie');
+const {
+  actorInputValidation,
+  movieInputValidation
+} = require('../util/validator');
 
 /**
  * @controller addActor
@@ -7,7 +11,17 @@ const Movie = require('../models/Movie');
  * @return
  */
 exports.postAddActor = (req, res, next) => {
-  const { name, birthday, country } = req.body;
+  const validationResult = actorInputValidation(req.body);
+
+  if (validationResult.err) {
+    const err = new Error();
+    err.statusCode = 400;
+    err.msg = 'validation failed.';
+    err.errors = validationResult.err;
+    return next(err);
+  }
+
+  const { name, birthday, country } = validationResult;
   const newActor = new Actor({
     name,
     birthday,
@@ -28,7 +42,17 @@ exports.postAddActor = (req, res, next) => {
  * @return
  */
 exports.postAddMovie = async (req, res, next) => {
-  const { title, year, rating, actors } = req.body;
+  const validationResult = movieInputValidation(req.body);
+
+  if (validationResult.err) {
+    const err = new Error();
+    err.statusCode = 400;
+    err.msg = 'validation failed.';
+    err.errors = validationResult.err;
+    return next(err);
+  }
+
+  const { title, year, rating, actors } = validationResult;
   const actorsNames = actors.split(',');
   let actorNamesList = actorsNames.map(actorName =>
     Actor.findOne({ name: actorName.trim() })
